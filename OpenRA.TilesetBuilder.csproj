@@ -35,7 +35,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <OutputPath>..\</OutputPath>
+    <OutputPath>.\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>x86</PlatformTarget>
@@ -44,6 +44,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenRA.Game">
+      <HintPath>..\OpenRA.Game.exe</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
@@ -105,13 +109,6 @@
     <Compile Include="FormNew.Designer.cs">
       <DependentUpon>FormNew.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenRA.Game\OpenRA.Game.csproj">
-      <Project>{0DFB103F-2962-400F-8C6D-E2C28CCBA633}</Project>
-      <Name>OpenRA.Game</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="tilesetbuilder_icon copy.ico" />

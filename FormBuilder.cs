@@ -82,7 +82,7 @@ namespace OpenRA.TilesetBuilder
 
 			var size = int.Parse(tsize);
 
-			var yaml = MiniYaml.DictFromFile("OpenRA.TilesetBuilder/defaults.yaml");
+			var yaml = MiniYaml.DictFromFile("defaults.yaml");
 			terrainDefinition = yaml["Terrain"].ToDictionary().Values.Select(y => new TerrainTypeInfo(y)).ToDictionary(t => t.Type);
 			var i = 0;
 			surface1.Icon = new Bitmap[terrainDefinition.Keys.Count];

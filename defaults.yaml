@@ -1,4 +1,9 @@
 Terrain:
+	TerrainType@Clear:
+		Type: Clear
+		AcceptsSmudgeType: none
+		IsWater: False
+		Color: FFFFFF
 	TerrainType@Sand:
 		Type: Sand
 		AcceptsSmudgeType: SandCrater

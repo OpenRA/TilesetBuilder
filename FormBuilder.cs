@@ -376,7 +376,7 @@ namespace OpenRA.TilesetBuilder
 					size: new int2(tp.Width, tp.Height),
 					tiles: tiles);
 
-				tileset.Templates.Add(cur, template);
+				tileset.Templates.Values.Add(template);
 				cur++;
 			}
 

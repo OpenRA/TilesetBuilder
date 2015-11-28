@@ -45,8 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenRA.Game">
-      <HintPath>..\OpenRA.Game.exe</HintPath>
-      <Private>True</Private>
+      <HintPath>OpenRA\OpenRA.Game.exe</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">

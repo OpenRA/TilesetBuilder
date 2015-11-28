@@ -1,0 +1,6 @@
+.vs
+obj
+
+*.dll
+*.exe
+*.pdb

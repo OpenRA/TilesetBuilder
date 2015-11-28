@@ -24,116 +24,41 @@ namespace OpenRA.TilesetBuilder
 	{
 		string srcfile;
 		int size;
-		public TerrainTypeInfo[] TerrainType;
-		public ImmutablePalette TerrainPalette;
-		public bool PaletteFromImage = true;
-		public string PaletteFile = "";
-		public string ImageFile = "";
-		public int TileSize = 24;
+		TerrainTypeInfo[] terrainType;
 
-		private static int ColorDiff(Color color, Color curr)
-		{
-			return Math.Abs(color.R - curr.R) + Math.Abs(color.G - curr.G) + Math.Abs(color.B - curr.B);
-		}
-
-		public void CreateNewTileset()
+		void CreateNewTileset()
 		{
 			this.Show();
-			using (var formNew = new FormNew { })
+			using (var formNew = new FormNew())
 				if (DialogResult.OK == formNew.ShowDialog())
 				{
-					PaletteFromImage = formNew.PaletteFromImage;
-					PaletteFile = formNew.PaletteFile;
-					ImageFile = formNew.ImageFile;
-					TileSize = formNew.TileSize;
+					srcfile = formNew.ImageFile;
+					this.size = formNew.TileSize;
 
-					srcfile = ImageFile;
-					this.size = TileSize;
-					surface1.TileSize = TileSize;
+					var bitmap = new Bitmap(srcfile);
 
-					Bitmap rbitmap;
-					using (var fbitmap = new Bitmap(ImageFile))
-						rbitmap = fbitmap.Clone(new Rectangle(0, 0, fbitmap.Width, fbitmap.Height),
-							fbitmap.PixelFormat);
-
-					int[] shadowIndex = { };
-
-					if (!PaletteFromImage)
+					if (!formNew.PaletteFromImage)
 					{
-						TerrainPalette = new ImmutablePalette(PaletteFile, shadowIndex);
-						rbitmap.Palette = TerrainPalette.AsSystemPalette();
+						var terrainPalette = new ImmutablePalette(formNew.PaletteFile, new int[0]);
+						bitmap.Palette = terrainPalette.AsSystemPalette();
 					}
 
-					surface1.Image = (Bitmap)rbitmap;
-					surface1.TilesPerRow = surface1.Image.Size.Width / surface1.TileSize;
-					surface1.Image.SetResolution(96, 96); // people keep being noobs about DPI, and GDI+ cares.
-					surface1.TerrainTypes = new int[surface1.Image.Width / size, surface1.Image.Height / size];		/* all passable by default */
-					surface1.Templates = new List<Template>();
-					surface1.Size = surface1.Image.Size;
-					surface1.Enabled = true;
-					Load();
+					InitializeSurface(bitmap);
 				}
 		}
 
 		public FormBuilder(string src, string tsize, bool autoExport, string outputDir)
 		{
 			InitializeComponent();
-			var terrainDefinition = new Dictionary<string, TerrainTypeInfo>();
+			LoadTerrainDefinitions();
 
-			var size = int.Parse(tsize);
-
-			var yaml = MiniYaml.DictFromFile("defaults.yaml");
-			terrainDefinition = yaml["Terrain"].ToDictionary().Values.Select(y => new TerrainTypeInfo(y)).ToDictionary(t => t.Type);
-			var i = 0;
-			surface1.Icon = new Bitmap[terrainDefinition.Keys.Count];
-			TerrainType = new TerrainTypeInfo[terrainDefinition.Keys.Count];
-
-			var title = this.Text;
-			surface1.UpdateMouseTilePosition += (x, y, tileNr) =>
-			{
-				this.Text = "{0} - {1} ({2,3}, {3,3}) tileNr: {4,3}".F(title, txtTilesetName.Text, x, y, tileNr);
-			};
-
-			surface1.Enabled = false;
-			foreach (var deftype in terrainDefinition)
-			{
-				var icon = new Bitmap(16, 16);
-
-				// Loop through the images pixels to reset color.
-				for (var x = 0; x < icon.Width; x++)
-				{
-					for (var y = 0; y < icon.Height; y++)
-					{
-						var newColor = deftype.Value.Color;
-						icon.SetPixel(x, y, newColor);
-					}
-				}
-
-				surface1.Icon[i] = icon;
-				TerrainType[i] = deftype.Value;
-
-				var terrainTypeButton = new ToolStripButton(deftype.Key, icon, TerrainTypeSelectorClicked);
-				terrainTypeButton.ToolTipText = deftype.Key;
-				terrainTypeButton.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
-				terrainTypeButton.Tag = i.ToString();
-				terrainTypeButton.ImageAlign = ContentAlignment.MiddleLeft;
-				i++;
-				terrainTypes.Items.Add(terrainTypeButton);
-			}
+			size = int.Parse(tsize);
 
 			if (src.Length > 0)
 			{
 				srcfile = src;
-				this.size = size;
-				surface1.TileSize = size;
-				surface1.Image = (Bitmap)Image.FromFile(src);
-				surface1.TilesPerRow = surface1.Image.Size.Width / surface1.TileSize;
-				surface1.Image.SetResolution(96, 96);	// people keep being noobs about DPI, and GDI+ cares.
-				surface1.TerrainTypes = new int[surface1.Image.Width / size, surface1.Image.Height / size];		/* all passable by default */
-				surface1.Templates = new List<Template>();
-				surface1.Size = surface1.Image.Size;
-				surface1.Enabled = true;
-				Load();
+				var bitmap = new Bitmap(srcfile);
+				InitializeSurface(bitmap);
 			}
 			else
 				CreateNewTileset();
@@ -145,7 +70,7 @@ namespace OpenRA.TilesetBuilder
 			}
 		}
 
-		public new void Load()
+		void LoadTileset()
 		{
 			try
 			{
@@ -170,7 +95,20 @@ namespace OpenRA.TilesetBuilder
 			catch { }
 		}
 
-		public void Save()
+		void InitializeSurface(Bitmap bitmap)
+		{
+			surface1.TileSize = size;
+			surface1.Image = bitmap;
+			surface1.TilesPerRow = surface1.Image.Size.Width / surface1.TileSize;
+			surface1.Image.SetResolution(96, 96); // people keep being noobs about DPI, and GDI+ cares.
+			surface1.TerrainTypes = new int[surface1.Image.Width / size, surface1.Image.Height / size]; /* all passable by default */
+			surface1.Templates = new List<Template>();
+			surface1.Size = surface1.Image.Size;
+			surface1.Enabled = true;
+			LoadTileset();
+		}
+
+		void Save()
 		{
 			using (var w = XmlWriter.Create(Path.ChangeExtension(srcfile, "tsx"),
 				new XmlWriterSettings { Indent = true, IndentChars = "  " }))
@@ -218,6 +156,50 @@ namespace OpenRA.TilesetBuilder
 			}
 		}
 
+		void LoadTerrainDefinitions()
+		{
+			var terrainDefinition = new Dictionary<string, TerrainTypeInfo>();
+			var yaml = MiniYaml.DictFromFile("defaults.yaml");
+			terrainDefinition = yaml["Terrain"].ToDictionary().Values.Select(y => new TerrainTypeInfo(y)).ToDictionary(t => t.Type);
+			surface1.Icon = new Bitmap[terrainDefinition.Keys.Count];
+			terrainType = new TerrainTypeInfo[terrainDefinition.Keys.Count];
+
+			var title = this.Text;
+			surface1.UpdateMouseTilePosition +=
+				(x, y, tileNr) =>
+				{
+					this.Text = "{0} - {1} ({2,3}, {3,3}) tileNr: {4,3}".F(title, txtTilesetName.Text, x, y, tileNr);
+				};
+
+			surface1.Enabled = false;
+			var i = 0;
+			foreach (var deftype in terrainDefinition)
+			{
+				var icon = new Bitmap(16, 16);
+
+				// Loop through the images pixels to reset color.
+				for (var x = 0; x < icon.Width; x++)
+				{
+					for (var y = 0; y < icon.Height; y++)
+					{
+						var newColor = deftype.Value.Color;
+						icon.SetPixel(x, y, newColor);
+					}
+				}
+
+				surface1.Icon[i] = icon;
+				terrainType[i] = deftype.Value;
+
+				var terrainTypeButton = new ToolStripButton(deftype.Key, icon, TerrainTypeSelectorClicked);
+				terrainTypeButton.ToolTipText = deftype.Key;
+				terrainTypeButton.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+				terrainTypeButton.Tag = i.ToString();
+				terrainTypeButton.ImageAlign = ContentAlignment.MiddleLeft;
+				terrainTypes.Items.Add(terrainTypeButton);
+				i++;
+			}
+		}
+
 		void TerrainTypeSelectorClicked(object sender, EventArgs e)
 		{
 			var tsb = (ToolStripButton)sender;
@@ -239,12 +221,12 @@ namespace OpenRA.TilesetBuilder
 			Export("Tilesets");
 		}
 
-		void Export2Clicked(object sender, EventArgs e)
+		void DumpClicked(object sender, EventArgs e)
 		{
 			ExportTemplateToTileNumberMapping();
 		}
 
-		static string ExportPalette(List<Color> p, string file)
+		string ExportPalette(List<Color> p, string file)
 		{
 			while (p.Count < Palette.Size) p.Add(Color.Black); // pad the palette out with extra blacks
 			var paletteData = p.Take(Palette.Size).SelectMany(
@@ -336,7 +318,7 @@ namespace OpenRA.TilesetBuilder
 			return filename;
 		}
 
-		public void Export(string outputDir)
+		void Export(string outputDir)
 		{
 			var dir = Platform.ResolvePath("^", outputDir);
 			Directory.CreateDirectory(dir);
@@ -363,7 +345,7 @@ namespace OpenRA.TilesetBuilder
 				name: tilesetName,
 				id: tilesetID.ToUpper(),
 				palette: tilesetPalette.ToLower(),
-				terrainInfo: TerrainType);
+				terrainInfo: terrainType);
 
 			// List of files to add to the mix file
 			var fileList = new List<string>();
@@ -383,7 +365,7 @@ namespace OpenRA.TilesetBuilder
 				var tiles = new byte[tp.Width * tp.Height];
 				foreach (var t in tp.Cells)
 				{
-					var ttype = TerrainType[surface1.TerrainTypes[t.Key.X, t.Key.Y]].Type;
+					var ttype = terrainType[surface1.TerrainTypes[t.Key.X, t.Key.Y]].Type;
 					var idx = (t.Key.X - tp.Left) + tp.Width * (t.Key.Y - tp.Top);
 					tiles[idx] = tileset.GetTerrainIndex(ttype);
 				}
@@ -402,7 +384,7 @@ namespace OpenRA.TilesetBuilder
 			Console.WriteLine("Finished export");
 		}
 
-		public void ExportTemplateToTileNumberMapping()
+		void ExportTemplateToTileNumberMapping()
 		{
 			Console.WriteLine("# start");
 			Console.WriteLine("# TemplateID CellID tilenr TemplateW TemplateH XinTilesPNG YinTilesPNG");
@@ -431,7 +413,7 @@ namespace OpenRA.TilesetBuilder
 			Console.WriteLine("# end\n");
 		}
 
-		private void TilesetNameChanged(object sender, EventArgs e)
+		void TilesetNameChanged(object sender, EventArgs e)
 		{
 			var tilesetFile = txtTilesetName.Text;
 			if (tilesetFile.Length > 8)
@@ -445,7 +427,7 @@ namespace OpenRA.TilesetBuilder
 				txtExt.Text = "." + tilesetFile.ToLower().Substring(0, 3) + ",.shp";
 		}
 
-		private void NewTilesetButton(object sender, EventArgs e)
+		void NewTilesetClicked(object sender, EventArgs e)
 		{
 			CreateNewTileset();
 		}

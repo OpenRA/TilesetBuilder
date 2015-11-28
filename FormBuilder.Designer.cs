@@ -50,12 +50,12 @@ namespace OpenRA.TilesetBuilder
 			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-			this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton16 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonNew = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonSave = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonExport = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonDump = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButtonOverlays = new System.Windows.Forms.ToolStripButton();
 			this.surface1 = new OpenRA.TilesetBuilder.Surface();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
 			this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -235,72 +235,72 @@ namespace OpenRA.TilesetBuilder
 			// 
 			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.toolStripButton15,
-			this.toolStripButton2,
-			this.toolStripButton14,
-			this.toolStripButton16,
+			this.toolStripButtonNew,
+			this.toolStripButtonSave,
+			this.toolStripButtonExport,
+			this.toolStripButtonDump,
 			this.toolStripSeparator1,
-			this.toolStripButton3});
+			this.toolStripButtonOverlays});
 			this.toolStrip1.Location = new System.Drawing.Point(3, 0);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(275, 25);
 			this.toolStrip1.TabIndex = 0;
 			// 
-			// toolStripButton15
+			// toolStripButtonNew
 			// 
-			this.toolStripButton15.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton15.Image")));
-			this.toolStripButton15.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton15.Name = "toolStripButton15";
-			this.toolStripButton15.Size = new System.Drawing.Size(48, 22);
-			this.toolStripButton15.Text = "New";
-			this.toolStripButton15.ToolTipText = "Create new tileset";
-			this.toolStripButton15.Click += new System.EventHandler(this.NewTilesetButton);
+			this.toolStripButtonNew.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonNew.Image")));
+			this.toolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonNew.Name = "toolStripButtonNew";
+			this.toolStripButtonNew.Size = new System.Drawing.Size(48, 22);
+			this.toolStripButtonNew.Text = "New";
+			this.toolStripButtonNew.ToolTipText = "Create new tileset";
+			this.toolStripButtonNew.Click += new System.EventHandler(this.NewTilesetClicked);
 			// 
-			// toolStripButton2
+			// toolStripButtonSave
 			// 
-			this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size(51, 22);
-			this.toolStripButton2.Text = "Save";
-			this.toolStripButton2.ToolTipText = "Save Template definitions to file (*.tsx)";
-			this.toolStripButton2.Click += new System.EventHandler(this.SaveClicked);
+			this.toolStripButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSave.Image")));
+			this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonSave.Name = "toolStripButtonSave";
+			this.toolStripButtonSave.Size = new System.Drawing.Size(51, 22);
+			this.toolStripButtonSave.Text = "Save";
+			this.toolStripButtonSave.ToolTipText = "Save Template definitions to file (*.tsx)";
+			this.toolStripButtonSave.Click += new System.EventHandler(this.SaveClicked);
 			// 
-			// toolStripButton14
+			// toolStripButtonExport
 			// 
-			this.toolStripButton14.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton14.Image")));
-			this.toolStripButton14.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton14.Name = "toolStripButton14";
-			this.toolStripButton14.Size = new System.Drawing.Size(59, 22);
-			this.toolStripButton14.Text = "Export";
-			this.toolStripButton14.ToolTipText = "Export defined Templates to files";
-			this.toolStripButton14.Click += new System.EventHandler(this.ExportClicked);
+			this.toolStripButtonExport.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonExport.Image")));
+			this.toolStripButtonExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonExport.Name = "toolStripButtonExport";
+			this.toolStripButtonExport.Size = new System.Drawing.Size(59, 22);
+			this.toolStripButtonExport.Text = "Export";
+			this.toolStripButtonExport.ToolTipText = "Export defined Templates to files";
+			this.toolStripButtonExport.Click += new System.EventHandler(this.ExportClicked);
 			// 
-			// toolStripButton16
+			// toolStripButtonDump
 			// 
-			this.toolStripButton16.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton14.Image")));
-			this.toolStripButton16.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton16.Name = "toolStripButton16";
-			this.toolStripButton16.Size = new System.Drawing.Size(65, 22);
-			this.toolStripButton16.Text = "Dump";
-			this.toolStripButton16.ToolTipText = "Dump Template ID to tile number mapping to console";
-			this.toolStripButton16.Click += new System.EventHandler(this.Export2Clicked);
+			this.toolStripButtonDump.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonExport.Image")));
+			this.toolStripButtonDump.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonDump.Name = "toolStripButtonDump";
+			this.toolStripButtonDump.Size = new System.Drawing.Size(65, 22);
+			this.toolStripButtonDump.Text = "Dump";
+			this.toolStripButtonDump.ToolTipText = "Dump Template ID to tile number mapping to console";
+			this.toolStripButtonDump.Click += new System.EventHandler(this.DumpClicked);
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
 			this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
 			// 
-			// toolStripButton3
+			// toolStripButtonOverlays
 			// 
-			this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
-			this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton3.Name = "toolStripButton3";
-			this.toolStripButton3.Size = new System.Drawing.Size(70, 22);
-			this.toolStripButton3.Text = "Overlays";
-			this.toolStripButton3.ToolTipText = "Show/hide terrain type overlays";
-			this.toolStripButton3.CheckOnClick = true;
-			this.toolStripButton3.Click += new System.EventHandler(this.ShowOverlaysClicked);
+			this.toolStripButtonOverlays.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonOverlays.Image")));
+			this.toolStripButtonOverlays.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonOverlays.Name = "toolStripButtonOverlays";
+			this.toolStripButtonOverlays.Size = new System.Drawing.Size(70, 22);
+			this.toolStripButtonOverlays.Text = "Overlays";
+			this.toolStripButtonOverlays.ToolTipText = "Show/hide terrain type overlays";
+			this.toolStripButtonOverlays.CheckOnClick = true;
+			this.toolStripButtonOverlays.Click += new System.EventHandler(this.ShowOverlaysClicked);
 			// 
 			// surface1
 			// 
@@ -308,7 +308,7 @@ namespace OpenRA.TilesetBuilder
 			this.surface1.ImagesList = this.ImageList;
 			this.surface1.Location = new System.Drawing.Point(0, 0);
 			this.surface1.Name = "surface1";
-			this.surface1.ShowTerrainTypes = this.toolStripButton3.Checked;
+			this.surface1.ShowTerrainTypes = this.toolStripButtonOverlays.Checked;
 			this.surface1.Size = new System.Drawing.Size(653, 454);
 			this.surface1.TabIndex = 2;
 			this.surface1.Text = "surface1";
@@ -321,6 +321,7 @@ namespace OpenRA.TilesetBuilder
 			this.Controls.Add(this.toolStripContainer1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "frmBuilder";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Tileset Builder 2";
 			this.toolStripContainer1.ContentPanel.ResumeLayout(false);
 			this.toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
@@ -339,12 +340,12 @@ namespace OpenRA.TilesetBuilder
 
 		private System.Windows.Forms.ToolStripContainer toolStripContainer1;
 		private System.Windows.Forms.ToolStrip toolStrip1;
-		private System.Windows.Forms.ToolStripButton toolStripButton2;
+		private System.Windows.Forms.ToolStripButton toolStripButtonSave;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.ToolStripButton toolStripButton3;
-		private System.Windows.Forms.ToolStripButton toolStripButton14;
-		private System.Windows.Forms.ToolStripButton toolStripButton15;
-		private System.Windows.Forms.ToolStripButton toolStripButton16;
+		private System.Windows.Forms.ToolStripButton toolStripButtonOverlays;
+		private System.Windows.Forms.ToolStripButton toolStripButtonExport;
+		private System.Windows.Forms.ToolStripButton toolStripButtonNew;
+		private System.Windows.Forms.ToolStripButton toolStripButtonDump;
 		public System.Windows.Forms.ImageList ImageList;
 		private System.Windows.Forms.ToolStrip terrainTypes;
 		private System.Windows.Forms.Panel panel1;

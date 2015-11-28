@@ -3,49 +3,49 @@ Terrain:
 		Type: Sand
 		AcceptsSmudgeType: SandCrater
 		IsWater: False
-		Color: 255,208,192,160
+		Color: FFD0C0A0
 	TerrainType@Transition:
 		Type: Transition
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,207,166,100
+		Color: FFCFA664
 	TerrainType@Rock:
 		Type: Rock
 		AcceptsSmudgeType: RockCrater
 		IsWater: False
-		Color: 255,206,140,66
+		Color: FFCE8C42
 	TerrainType@Cliff:
 		Type: Cliff
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,74,41,16
+		Color: FF4A2910
 	TerrainType@Rough:
 		Type: Rough
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,88,116,116
+		Color: FF587474
 	TerrainType@Concrete:
 		Type: Concrete
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,208,192,160
+		Color: FFD0C0A0
 	TerrainType@Dune:
 		Type: Dune
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,239,222,140
+		Color: FFEFDE8C
 	TerrainType@Spice:
 		Type: Spice
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,239,148,74
+		Color: FFEF944A
 	TerrainType@SpiceBlobs:
 		Type: SpiceBlobs
 		AcceptsSmudgeType: none
 		IsWater: False
-		Color: 255,206,115,66
+		Color: FFCE7342
 	TerrainType@Ice:
 		Type: Ice
 		AcceptsSmudgeType: none
 		IsWater: True
-		Color: 255,255,255,255
+		Color: FFFFFF

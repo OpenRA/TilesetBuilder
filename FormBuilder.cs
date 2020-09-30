@@ -25,22 +25,30 @@ namespace OpenRA.TilesetBuilder
 		string srcfile;
 		int size;
 		TerrainTypeInfo[] terrainType;
+		Dictionary<ushort, TerrainTemplateInfo> templates;
 
 		void CreateNewTileset()
 		{
-			this.Show();
+			Show();
 			using (var formNew = new FormNew())
 				if (DialogResult.OK == formNew.ShowDialog())
 				{
 					srcfile = formNew.ImageFile;
-					this.size = formNew.TileSize;
+					size = formNew.TileSize;
 
 					var bitmap = new Bitmap(srcfile);
-
 					if (!formNew.PaletteFromImage)
 					{
 						var terrainPalette = new ImmutablePalette(formNew.PaletteFile, new int[0]);
-						bitmap.Palette = terrainPalette.AsSystemPalette();
+
+						ColorPalette pal;
+						using (var b = new Bitmap(1, 1, PixelFormat.Format8bppIndexed))
+							pal = b.Palette;
+
+						for (var i = 0; i < 256; i++)
+							pal.Entries[i] = Color.FromArgb(terrainPalette.GetColor(i).ToArgb());
+
+						bitmap.Palette = pal;
 					}
 
 					InitializeSurface(bitmap);
@@ -159,16 +167,18 @@ namespace OpenRA.TilesetBuilder
 		void LoadTerrainDefinitions()
 		{
 			var terrainDefinition = new Dictionary<string, TerrainTypeInfo>();
-			var yaml = MiniYaml.DictFromFile("defaults.yaml");
-			terrainDefinition = yaml["Terrain"].ToDictionary().Values.Select(y => new TerrainTypeInfo(y)).ToDictionary(t => t.Type);
+			var yaml = MiniYaml.FromFile("defaults.yaml").FirstOrDefault(y => y.Key == "Terrain").Value.Nodes;
+			terrainDefinition = yaml.Select(n => new TerrainTypeInfo(n.Value)).ToDictionary(t => t.Type);
+
 			surface1.Icon = new Bitmap[terrainDefinition.Keys.Count];
 			terrainType = new TerrainTypeInfo[terrainDefinition.Keys.Count];
+			templates = new Dictionary<ushort, TerrainTemplateInfo>();
 
 			var title = this.Text;
 			surface1.UpdateMouseTilePosition +=
 				(x, y, tileNr) =>
 				{
-					this.Text = "{0} - {1} ({2,3}, {3,3}) tileNr: {4,3}".F(title, txtTilesetName.Text, x, y, tileNr);
+					Text = "{0} - {1} ({2,3}, {3,3}) tileNr: {4,3}".F(title, txtTilesetName.Text, x, y, tileNr);
 				};
 
 			surface1.Enabled = false;
@@ -183,7 +193,7 @@ namespace OpenRA.TilesetBuilder
 					for (var y = 0; y < icon.Height; y++)
 					{
 						var newColor = deftype.Value.Color;
-						icon.SetPixel(x, y, newColor);
+						icon.SetPixel(x, y, Color.FromArgb(newColor.ToArgb()));
 					}
 				}
 
@@ -324,18 +334,15 @@ namespace OpenRA.TilesetBuilder
 			Directory.CreateDirectory(dir);
 			var tilesetName = txtTilesetName.Text;
 			var tilesetID = txtID.Text;
-			var tilesetPalette = txtPal.Text;
 			var tilesetExt = txtExt.Text;
 
 			if (tilesetName.Length < 1) tilesetName = "Temperat";
 			if (tilesetID.Length < 1) tilesetID = "TEMPERAT";
-			if (tilesetPalette.Length < 1) tilesetPalette = "temperat";
 			if (tilesetExt.Length < 1) tilesetExt = ".tem";
 
 			// Create a Tileset definition
 			// TODO: Pull this info from the GUI
-			var tilesetFile = "";
-			tilesetFile = tilesetName.ToLower();
+			var tilesetFile = tilesetName.ToLower();
 			if (tilesetFile.Length < 8)
 				tilesetFile = tilesetName.ToLower() + ".yaml";
 			else
@@ -344,15 +351,10 @@ namespace OpenRA.TilesetBuilder
 			var tileset = new TileSet(
 				name: tilesetName,
 				id: tilesetID.ToUpper(),
-				palette: tilesetPalette.ToLower(),
 				terrainInfo: terrainType);
 
 			// List of files to add to the mix file
 			var fileList = new List<string>();
-
-			// Export palette (use the embedded palette)
-			var p = surface1.Image.Palette.Entries.ToList();
-			fileList.Add(ExportPalette(p, Path.Combine(dir, tileset.Palette)));
 
 			// Export tile artwork
 			foreach (var t in surface1.Templates)
@@ -360,6 +362,7 @@ namespace OpenRA.TilesetBuilder
 
 			// Add the templates
 			ushort cur = 0;
+			templates.Clear();
 			foreach (var tp in surface1.Templates)
 			{
 				var tiles = new byte[tp.Width * tp.Height];
@@ -376,11 +379,21 @@ namespace OpenRA.TilesetBuilder
 					size: new int2(tp.Width, tp.Height),
 					tiles: tiles);
 
-				tileset.Templates.Values.Add(template);
+				// HACK: This part of the TileSet code is broken upstream
+				var field = template.GetType()
+					.GetField("tileInfo", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+				field.SetValue(template, tiles.Select(t =>
+				{
+					var info = new TerrainTileInfo();
+					info.GetType().GetField("TerrainType").SetValue(info, t);
+					return info;
+				}).ToArray());
+
+				templates[cur] = template;
 				cur++;
 			}
 
-			tileset.Save(Path.Combine(dir, tilesetFile));
+			SaveTileSet(tileset, Path.Combine(dir, tilesetFile));
 			Console.WriteLine("Finished export");
 		}
 
@@ -430,6 +443,45 @@ namespace OpenRA.TilesetBuilder
 		void NewTilesetClicked(object sender, EventArgs e)
 		{
 			CreateNewTileset();
+		}
+
+		void SaveTileSet(TileSet tileSet, string path)
+		{
+			var root = new List<MiniYamlNode>();
+			root.Add(new MiniYamlNode("Terrain", null,
+				tileSet.TerrainInfo.Select(t => new MiniYamlNode("TerrainType@{0}".F(t.Type), SaveTerrainInfo(t))).ToList()));
+
+			root.Add(new MiniYamlNode("Templates", null,
+				templates.Select(t => new MiniYamlNode("Template@{0}".F(t.Value.Id), SaveTemplate(t.Value, tileSet))).ToList()));
+
+			root.WriteToFile(path);
+		}
+
+		MiniYaml SaveTerrainInfo(TerrainTypeInfo t)
+		{
+			return FieldSaver.SaveDifferences(t, new TerrainTypeInfo(new MiniYaml("TerrainType")));
+		}
+
+		MiniYaml SaveTileInfo(TerrainTileInfo t, TileSet tileSet)
+		{
+			return new MiniYaml(tileSet.TerrainInfo[t.TerrainType].Type, new List<MiniYamlNode>());
+		}
+
+		MiniYaml SaveTemplate(TerrainTemplateInfo t, TileSet tileSet)
+		{
+			var defaultTemplate = new TerrainTemplateInfo(0, new string[] { null }, int2.Zero, null);
+			var root = FieldSaver.SaveDifferences(t, defaultTemplate);
+
+			var tileYaml = new List<MiniYamlNode>();
+			for (var i = 0; i < t.TilesCount; i++)
+			{
+				var tileInfo = t[i];
+				if (tileInfo != null)
+					tileYaml.Add(new MiniYamlNode(i.ToString(), SaveTileInfo(tileInfo, tileSet)));
+			}
+
+			root.Nodes.Add(new MiniYamlNode("Tiles", null, tileYaml));
+			return root;
 		}
 	}
 }

@@ -78,13 +78,32 @@ namespace OpenRA.TilesetBuilder
 						e.Graphics.FillRectangle(currentBrush, TileSize * c.X, TileSize * c.Y, TileSize, TileSize);
 
 					if (!t.Cells.ContainsKey(c + new int2(-1, 0)))
-						e.Graphics.DrawLine(pen, (TileSize * c).ToPoint(), (TileSize * (c + new int2(0, 1))).ToPoint());
+					{
+						var a = TileSize * c;
+						var b = TileSize * (c + new int2(0, 1));
+						e.Graphics.DrawLine(pen, new Point(a.X, a.Y), new Point(b.X, b.Y));
+					}
+
 					if (!t.Cells.ContainsKey(c + new int2(+1, 0)))
-						e.Graphics.DrawLine(pen, (TileSize * (c + new int2(1, 0))).ToPoint(), (TileSize * (c + new int2(1, 1))).ToPoint());
+					{
+						var a = TileSize * (c + new int2(1, 0));
+						var b = TileSize * (c + new int2(1, 1));
+						e.Graphics.DrawLine(pen, new Point(a.X, a.Y), new Point(b.X, b.Y));
+					}
+
 					if (!t.Cells.ContainsKey(c + new int2(0, +1)))
-						e.Graphics.DrawLine(pen, (TileSize * (c + new int2(0, 1))).ToPoint(), (TileSize * (c + new int2(1, 1))).ToPoint());
+					{
+						var a = TileSize * (c + new int2(0, 1));
+						var b = TileSize * (c + new int2(1, 1));
+						e.Graphics.DrawLine(pen, new Point(a.X, a.Y), new Point(b.X, b.Y));
+					}
+
 					if (!t.Cells.ContainsKey(c + new int2(0, -1)))
-						e.Graphics.DrawLine(pen, (TileSize * c).ToPoint(), (TileSize * (c + new int2(1, 0))).ToPoint());
+					{
+						var a = TileSize * c;
+						var b = TileSize * (c + new int2(1, 0));
+						e.Graphics.DrawLine(pen, new Point(a.X, a.Y), new Point(b.X, b.Y));
+					}
 				}
 			}
 		}

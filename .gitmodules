@@ -1,0 +1,3 @@
+[submodule "OpenRA"]
+	path = OpenRA
+	url = git://github.com/OpenRA/OpenRA.git

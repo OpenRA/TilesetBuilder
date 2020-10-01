@@ -6,6 +6,17 @@ Open indexed PNG files and export them into Westwood 2D terrain tile files.
 
 More info on this wiki page: https://github.com/OpenRA/TilesetBuilder/wiki
 
-Build instructions:
+## Build instructions
 
-Copy the entire TilesetBuilder directory inside OpenRA's root directory. Build OpenRA if you haven't. Open the TilesetBuilder directory and run make.cmd by double-clicking.
+Enter those commands in a command line:
+```
+git submodule init
+git submodule update
+cd OpenRA
+make all
+cd ..
+make
+```
+
+If you don't use git, put engine version `8596ce00cc27c3cc2ee4cd899465793ab7b5faa0` inside the "OpenRA" folder.
+Then build the engine and run the `make` command in the TilesetBuilder directory.
